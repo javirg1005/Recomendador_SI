@@ -24,6 +24,50 @@ def insert_csv_to_table(table_name, n_col, rows):
     con.commit()
     con.close()
 
+def recomendacion():
+
+    print('Yo recomiendo')
+
+def prediccion():
+
+    print('Yo predizco')
+
+def obtenerNumPelis():
+    con = sqlite3.connect("Movies.db")
+    cur = con.cursor()
+    cur.execute("SELECT count(*) FROM movies")
+    userMovies = cur.fetchall()
+    con.commit()
+    con.close()
+    return userMovies
+
+def obtenerMaxIdPeli():
+    con = sqlite3.connect("Movies.db")
+    cur = con.cursor()
+    cur.execute("SELECT max(movieId) FROM movies")
+    userMovies = cur.fetchall()
+    con.commit()
+    con.close()
+    return userMovies
+
+def obtenerRatings():
+    con = sqlite3.connect("Movies.db")
+    cur = con.cursor()
+    cur.execute(" ")
+    rating = cur.fetchall()
+    con.commit()
+    con.close()
+    return rating
+
+def obtenerUsuarios():
+    con = sqlite3.connect("Movies.db")
+    cur = con.cursor()
+    cur.execute(" ")
+    userMovies = cur.fetchall()
+    con.commit()
+    con.close()
+    return userMovies
+
 '''
 def filtrado_usuarios(df_rate, df_movies, userId):
     df_movies = df_movies.drop('genre', 1)
@@ -40,7 +84,6 @@ def filtrado_usuarios(df_rate, df_movies, userId):
     #Filtrando los usuarios que han visto las películas y guardándolas
     userSubset = df_rate_movies[df_rate_movies['movieId'].isin(df_user_movies['movieId'].tolist())]
     print(userSubset)
-'''
 
 def filtrado_contenido(df_rate, df_movies, userId):
     #Copiando el marco de datos de la pelicula en uno nuevo ya que no necesitamos la información del género por ahora.
@@ -88,6 +131,33 @@ def filtrado_contenido(df_rate, df_movies, userId):
     #Tabla de recomendaciones final
     df_recomendacion = df_movies.loc[df_movies['movieId'].isin(df_reco.head(20).keys())]
     print(df_recomendacion)
+'''
+
+def ajustarMedia(df, n_users, n_items, user_rows, item_columns, movie_list):
+    df = df.replace(0, np.NaN)
+    df_u = df.mean(axis = 1)
+    dif_matrix = np.zeros((n_users + 1, n_items + 1))
+
+    for i, row in df.iterrows():
+        #print("Media de fila " + str(i) + ": " + str(df_u[i]))
+        for j, value in row.iteritems():
+            dif_matrix[i][j] = value - df_u[i]
+    
+    dif_matrix = pd.DataFrame(dif_matrix)
+    dif_matrix = dif_matrix.drop(index=0)
+    dif_matrix = dif_matrix.drop(columns=0)
+
+    dif_matrix.index = user_rows
+    dif_matrix.columns = item_columns
+    dif_matrix = dif_matrix[movie_list]
+
+    user_rows = list(range(0, n_users))
+    item_columns = list(range(0, obtenerNumPelis()[0][0]))
+
+    dif_matrix.index = user_rows
+    dif_matrix.columns = item_columns
+
+    return dif_matrix
 
 fill_table("links.csv", "links", 3)
 fill_table("movies.csv", "movies", 3)
@@ -120,4 +190,24 @@ df_movies['title'] = df_movies['title'].apply(lambda x: x.strip())
 df_rate = df_rate.drop('timestamp', 1)
 
 #filtrado_usuarios(df_rate, df_movies, 1)
-filtrado_contenido(df_rate, df_movies, 1)
+#filtrado_contenido(df_rate, df_movies, 1)
+
+n_users = df_rate.userId.unique().shape[0]
+n_items = obtenerMaxIdPeli()
+n_items = n_items[0][0]
+
+user_rows = list(range(1, n_users + 1))
+item_columns = list(range(1, n_items + 1))
+
+data_matrix = np.zeros((n_users, n_items))
+for line in df_rate.itertuples():
+    data_matrix[line[1]-1, line[2]-1] = line[3]
+
+data_matrix = pd.DataFrame(data_matrix, index=user_rows, columns=item_columns)
+
+movie_list = df_movies['movieId'].tolist()
+data_matrix = data_matrix[movie_list]
+
+dif_matrix = ajustarMedia(data_matrix, n_users, n_items, user_rows, item_columns, movie_list)
+
+print(dif_matrix.head(10))
