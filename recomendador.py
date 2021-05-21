@@ -1,7 +1,9 @@
 import sqlite3
+from sre_constants import JUMP
 import pandas as pd
 import numpy as np
 import csv
+from scipy.spatial.distance import cosine
 
 def fill_table(file_name, table_name, n_col):
     file = open("ml-latest-small\\" + file_name, encoding="utf8")
@@ -50,14 +52,14 @@ def obtenerMaxIdPeli():
     con.close()
     return userMovies
 
-def obtenerRatings():
+def obtenerRatings(usu, movie):
     con = sqlite3.connect("Movies.db")
     cur = con.cursor()
-    cur.execute(" ")
-    rating = cur.fetchall()
+    cur.execute("SELECT rating FROM ratings WHERE userId = "+ str(usu)+" AND movieId = "+str(movie))
+    rating = cur.fetchone()
     con.commit()
     con.close()
-    return rating
+    return rating[0]
 
 def obtenerUsuarios():
     con = sqlite3.connect("Movies.db")
@@ -68,14 +70,26 @@ def obtenerUsuarios():
     con.close()
     return userMovies
 
-def obtenerPelis():
+def obtenerPelis(usu):
     con = sqlite3.connect("Movies.db")
     cur = con.cursor()
-    cur.execute("SELECT movieId, title FROM movies")
+    cur.execute("SELECT ratings.movieId, movies.title FROM ratings JOIN movies ON ratings.movieId = movies.movieId WHERE userId != "+ str(usu) +" GROUP BY ratings.movieId")
     userMovies = cur.fetchall()
     con.commit()
     con.close()
     return userMovies
+
+def obtenerIdPelis(usu):
+    con = sqlite3.connect("Movies.db")
+    cur = con.cursor()
+    cur.execute("SELECT movieId FROM ratings WHERE userId = "+ str(usu))
+    userMovies = cur.fetchall()
+    movieids = []
+    for movie in userMovies:
+        movieids.append(movie[0])
+    con.commit()
+    con.close()
+    return movieids
 
 '''
 def filtrado_usuarios(df_rate, df_movies, userId):
@@ -168,26 +182,49 @@ def ajustarMedia(df, n_users, n_items, user_rows, item_columns, movie_list):
 
     return dif_matrix
 
-#coso internet
-def prediccion(resultado, similitud, type='item'):
-    if type == 'item':
-        pred = resultado.dot(similitud)/ np.array([np.abs(similitud).son(axix=1)])
-    else:
-        print('error')
-    return pred
-
 #coso adaptado #INPROGRESS
-#VAR: pelii = peli interes, usuario = usuario interes, df = dataframe
+#VAR: pelii = peli interes, usuario = userid == usuario, df = dataframe
 def pred(pelii, usuario, df):
     #calcular la similitud
-    for movie in df:    #movie == columna 
-        if movie[Rating] == 'NaN': #encontrar columna del usuario sin datos
-            df = df.drop(df[movie], 1) #tirar la columna que el usuario no tenga y se guarda en coso paralelo
+    movieids = obtenerIdPelis(usuario)
+    numerador = 0 #sumatorio
+    denominador = 0 #sumatorio
+    for rmovie in movieids: #hacer algo para evitar el NaN
+        coseno = similitud_coseno(df, rmovie, pelii)
+        if coseno == np.NaN:
+            print('salta')
+        else:
+            rateUsu = obtenerRatings(usuario, rmovie)
+            aux = coseno * rateUsu
+            numerador += aux
+            denominador += coseno
+            print('suma')
+
+    calculo = numerador / denominador
+    return calculo
+
+
+
+def similitud_coseno(df, colum1, colum2): #FALLA EN NaN hay que quitarlos
+    #Intento de arreglo
+    aux = pd.concat([df[colum1],df[colum2]],axis=1)
+    aux = aux.dropna(how=any, axis=0)
+    print(aux)
     
+    
+    #No tocar
+    #hacer el calculo matematico entre columna 1 y 2
+    scoreDistance = cosine(aux[colum1], aux[colum2])
+    print(scoreDistance)
+    return scoreDistance
 
+#pillar la peli 1 DONE
+#hacer un for con valoradas DONE
+#similitud       valor peli no valorada y valorada, dataframe 2 colums, drop nan, realizar similitud
+#Aplicar formula apuntes 
 
-    return 'patata'
-
+#NOTA::
+#hacerte una funcion de cosine similarity
 
 fill_table("links.csv", "links", 3)
 fill_table("movies.csv", "movies", 3)
@@ -238,15 +275,15 @@ data_matrix = pd.DataFrame(data_matrix, index=user_rows, columns=item_columns)
 movie_list = df_movies['movieId'].tolist()
 data_matrix = data_matrix[movie_list]
 
-#dif_matrix = ajustarMedia(data_matrix, n_users, n_items, user_rows, item_columns, movie_list)
+
+dif_matrix = ajustarMedia(data_matrix, n_users, n_items, user_rows, item_columns, movie_list)
 #print(dif_matrix.head(10))
 
+prediccion = pred(1,1,dif_matrix)
+print(prediccion)
 
 
 
 ###REFLEXIONES EN GRUPO 
 
-#pillar la peli 1
-#hacer un for con valoradas
-#similitud       valor peli no valorada y valorada, dataframe 2 colums, drop nan, realizar similitud
-#Aplicar formula apuntes 
+

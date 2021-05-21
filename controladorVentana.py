@@ -16,9 +16,9 @@ class MyWindow(QtWidgets.QMainWindow):
             users.append("ID. " + str(user[0]))
         return users
 
-    def post_peli(self):
+    def post_peli(self, usu):
         pelis = []
-        pelis_tupla = reco.obtenerPelis()
+        pelis_tupla = reco.obtenerPelis(usu)
         for peli in pelis_tupla:
             pelis.append("ID. " + str(peli[0]) + ". " + str(peli[1]))
         return pelis
@@ -29,7 +29,7 @@ class MyWindow(QtWidgets.QMainWindow):
 
         #Cargar los datos en las combobox
         usus = self.post_usu()
-        pelis = self.post_peli()
+       
 
         self.cbox_usu.clear()
         self.cbox_usu.addItems(usus)
@@ -37,13 +37,12 @@ class MyWindow(QtWidgets.QMainWindow):
         self.cbox_usu_pred.clear()
         self.cbox_usu_pred.addItems(usus)
 
-        self.cbox_mov.clear()
-        self.cbox_mov.addItems(pelis)
-
         #Acciones de botones botones
         self.btn_reco.clicked.connect(self.controlador_recomendar)
 
         self.btn_pred.clicked.connect(self.controlador_predecir)
+
+        self.btn_selec_usu.clicked.connect(self.controlador_select_usu)
 
     #BOTONES
     
@@ -59,10 +58,21 @@ class MyWindow(QtWidgets.QMainWindow):
     def controlador_predecir(self):
         usu = self.get_pred_usu()
         peli = self.get_pred_peli()
-        
+        print("Usuario: " + usu)
+        print("Pelicula: " + peli)
+
         print("Intento predecir")
 
-    #COMBOX  - #DONE
+    def controlador_select_usu(self):
+        usu = self.get_usu()
+        pelis = self.post_peli(usu)
+        self.cbox_mov.clear()
+        self.cbox_mov.addItems(pelis)
+
+        print("Usuario seleccionado")
+        
+    
+    #COMBOX  - #DONE no tocar
     
     def get_usu(self): #Recoge usuario de recomendacion
         cbox_value = str(self.cbox_usu.currentText())
@@ -74,13 +84,12 @@ class MyWindow(QtWidgets.QMainWindow):
         userId = re.match("ID\.\s*(\d*)", cbox_value)
         return userId.group(1)
 
-    #CAMBIAR ##############################################################################################################
-    #Tiene que ser pelis que no esten valoradas por el con lo que hay que cambiar la consulta
+
     def get_pred_peli(self): #Recoge el peli de prediccion
         cbox_value = str(self.cbox_mov.currentText())
         movId = re.match("ID\.\s*(\d*)", cbox_value)
         return movId.group(1)
-    #######################################################################################################################
+    
     #TEXTFIELD - #DONE no tocar
     
     def get_npelis(self): #Recoge numero de pelis a mostrar en la tabla de recomendacion
@@ -96,7 +105,9 @@ class MyWindow(QtWidgets.QMainWindow):
 
 
     #LABELS
-    
+    def set_label(self, pred):
+        self.lbl_prediccion.setText("La prediccion es de " + pred)
+
 
     #PROGESSBAR
 

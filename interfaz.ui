@@ -235,6 +235,19 @@
       <number>24</number>
      </property>
     </widget>
+    <widget class="QPushButton" name="btn_selec_usu">
+     <property name="geometry">
+      <rect>
+       <x>180</x>
+       <y>40</y>
+       <width>171</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Seleccionar usuario</string>
+     </property>
+    </widget>
    </widget>
    <widget class="Line" name="line">
     <property name="geometry">
