@@ -62,7 +62,16 @@ def obtenerRatings():
 def obtenerUsuarios():
     con = sqlite3.connect("Movies.db")
     cur = con.cursor()
-    cur.execute(" ")
+    cur.execute("SELECT userId FROM ratings GROUP BY userId")
+    userMovies = cur.fetchall()
+    con.commit()
+    con.close()
+    return userMovies
+
+def obtenerPelis():
+    con = sqlite3.connect("Movies.db")
+    cur = con.cursor()
+    cur.execute("SELECT movieId, title FROM movies")
     userMovies = cur.fetchall()
     con.commit()
     con.close()
@@ -159,6 +168,27 @@ def ajustarMedia(df, n_users, n_items, user_rows, item_columns, movie_list):
 
     return dif_matrix
 
+#coso internet
+def prediccion(resultado, similitud, type='item'):
+    if type == 'item':
+        pred = resultado.dot(similitud)/ np.array([np.abs(similitud).son(axix=1)])
+    else:
+        print('error')
+    return pred
+
+#coso adaptado #INPROGRESS
+#VAR: pelii = peli interes, usuario = usuario interes, df = dataframe
+def pred(pelii, usuario, df):
+    #calcular la similitud
+    for movie in df:    #movie == columna 
+        if movie[Rating] == 'NaN': #encontrar columna del usuario sin datos
+            df = df.drop(df[movie], 1) #tirar la columna que el usuario no tenga y se guarda en coso paralelo
+    
+
+
+    return 'patata'
+
+
 fill_table("links.csv", "links", 3)
 fill_table("movies.csv", "movies", 3)
 fill_table("ratings.csv", "ratings", 4)
@@ -208,6 +238,15 @@ data_matrix = pd.DataFrame(data_matrix, index=user_rows, columns=item_columns)
 movie_list = df_movies['movieId'].tolist()
 data_matrix = data_matrix[movie_list]
 
-dif_matrix = ajustarMedia(data_matrix, n_users, n_items, user_rows, item_columns, movie_list)
+#dif_matrix = ajustarMedia(data_matrix, n_users, n_items, user_rows, item_columns, movie_list)
+#print(dif_matrix.head(10))
 
-print(dif_matrix.head(10))
+
+
+
+###REFLEXIONES EN GRUPO 
+
+#pillar la peli 1
+#hacer un for con valoradas
+#similitud       valor peli no valorada y valorada, dataframe 2 colums, drop nan, realizar similitud
+#Aplicar formula apuntes 

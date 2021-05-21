@@ -29,7 +29,7 @@
     <property name="frameShadow">
      <enum>QFrame::Raised</enum>
     </property>
-    <widget class="QComboBox" name="SelecUsu">
+    <widget class="QComboBox" name="cbox_usu">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -44,7 +44,7 @@
       <rect>
        <x>20</x>
        <y>20</y>
-       <width>261</width>
+       <width>201</width>
        <height>16</height>
       </rect>
      </property>
@@ -65,7 +65,7 @@
       <string>Recomendar Peliculas</string>
      </property>
     </widget>
-    <widget class="QListView" name="T_Rating">
+    <widget class="QListView" name="ql_reco">
      <property name="geometry">
       <rect>
        <x>250</x>
@@ -101,7 +101,7 @@
       <string>Umbral de similitud deseado:</string>
      </property>
     </widget>
-    <widget class="QTextEdit" name="nFilas">
+    <widget class="QTextEdit" name="te_filas">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -111,7 +111,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QTextEdit" name="umbralSimilitud">
+    <widget class="QTextEdit" name="te_umbral">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -150,7 +150,7 @@
     <property name="frameShadow">
      <enum>QFrame::Raised</enum>
     </property>
-    <widget class="QComboBox" name="selecMov_pre">
+    <widget class="QComboBox" name="cbox_mov">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -160,7 +160,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QComboBox" name="selecUsu_pre">
+    <widget class="QComboBox" name="cbox_usu_pred">
      <property name="geometry">
       <rect>
        <x>20</x>
