@@ -22,6 +22,7 @@ class MyWindow(QtWidgets.QMainWindow):
         for peli in pelis_tupla:
             pelis.append("ID. " + str(peli[0]) + ". " + str(peli[1]))
         return pelis
+    
 
     def __init__(self):
         super(MyWindow,self).__init__()
@@ -56,11 +57,15 @@ class MyWindow(QtWidgets.QMainWindow):
         print("Umbral: " + u_sim)
 
     def controlador_predecir(self):
-        usu = self.get_pred_usu()
-        peli = self.get_pred_peli()
-        print("Usuario: " + usu)
-        print("Pelicula: " + peli)
+        usu = int(self.get_pred_usu())
+        peli = int(self.get_pred_peli())
+        print("Usuario: ", usu)
+        print("Pelicula: ", peli)
+        df = reco.get_dataframe()
+        print(df.head(5))
 
+        resultado = reco.pred(peli, usu, df)
+        self.predecir_resultado.setText("La predicción es de " + str(resultado))
         print("Intento predecir")
 
     def controlador_select_usu(self):
