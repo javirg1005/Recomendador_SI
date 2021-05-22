@@ -22,7 +22,6 @@ class MyWindow(QtWidgets.QMainWindow):
         for peli in pelis_tupla:
             pelis.append("ID. " + str(peli[0]) + ". " + str(peli[1]))
         return pelis
-    
 
     def __init__(self):
         super(MyWindow,self).__init__()
@@ -69,12 +68,12 @@ class MyWindow(QtWidgets.QMainWindow):
         print("Intento predecir")
 
     def controlador_select_usu(self):
-        usu = self.get_usu()
+        usu = self.get_pred_usu()
         pelis = self.post_peli(usu)
         self.cbox_mov.clear()
         self.cbox_mov.addItems(pelis)
 
-        print("Usuario seleccionado")
+        print("Usuario " + str(usu) +  " seleccionado")
         
     
     #COMBOX  - #DONE no tocar

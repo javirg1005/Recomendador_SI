@@ -71,11 +71,14 @@ def obtenerUsuarios():
 def obtenerPelis(usu):
     con = sqlite3.connect("Movies.db")
     cur = con.cursor()
-    cur.execute("SELECT ratings.movieId, movies.title FROM ratings JOIN movies ON ratings.movieId = movies.movieId WHERE userId != "+ str(usu) +" GROUP BY ratings.movieId")
+    cur.execute("SELECT ratings.movieId, movies.title FROM ratings JOIN movies ON ratings.movieId = movies.movieId WHERE ratings.userId == " + str(usu) + " GROUP BY ratings.movieId ORDER BY movies.movieId ASC")
     userMovies = cur.fetchall()
+    cur.execute("SELECT movieId, title FROM movies ORDER BY movieId ASC")
+    moviesList = cur.fetchall()
+    movies_not_seen = [movie for movie in moviesList if movie not in userMovies]
     con.commit()
     con.close()
-    return userMovies
+    return movies_not_seen
 
 def obtenerIdPelis(usu):
     con = sqlite3.connect("Movies.db")
