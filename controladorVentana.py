@@ -1,6 +1,6 @@
 # Imports
 import sys
-from PyQt5 import QtWidgets, uic
+from PyQt5 import QtWidgets, uic, QtGui
 import recomendador as reco
 import re
 
@@ -55,13 +55,20 @@ class MyWindow(QtWidgets.QMainWindow):
         u_sim = self.get_u_sim()
         print("Umbral: " + u_sim)
 
+        res = reco.recov2(usu,n_pelis,u_sim)
+        self.ql_reco.setColumnCount(2)
+        self.ql_reco.setRowCount(len(res))
+    
+        for i in range(0,len(res)):
+            for j in range(0,2):
+                self.ql_reco.setItem(i,j,QTableWidgetItem((res[i][j])))
+
     def controlador_predecir(self):
         usu = int(self.get_pred_usu())
         peli = int(self.get_pred_peli())
         print("Usuario: ", usu)
         print("Pelicula: ", peli)
         df = reco.get_dataframe()
-        print(df.head(5))
 
         resultado = reco.pred(peli, usu, df)
         self.predecir_resultado.setText("La predicción es de " + str(resultado))
@@ -107,10 +114,7 @@ class MyWindow(QtWidgets.QMainWindow):
     #QTABLE
 
 
-
     #LABELS
-    def set_label(self, pred):
-        self.lbl_prediccion.setText("La prediccion es de " + pred)
 
 
     #PROGESSBAR
