@@ -28,7 +28,7 @@ def insert_csv_to_table(table_name, n_col, rows):
     con.commit()
     con.close()
 
-def recomendacion():
+def recomendacion(usu, rankSize, umbral ):
 
     print('Yo recomiendo')
 
