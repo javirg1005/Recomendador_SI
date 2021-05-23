@@ -109,7 +109,6 @@ def ajustarMedia(df, n_users, n_items, user_rows, item_columns, movie_list):
     parche = dif_matrix
     return dif_matrix
 
-#VAR: pelii = peli interes, usuario = userid == usuario, df = dataframe
 def pred(pelii, usuario, df):
     #calcular la similitud
     movieids = obtenerIdPelis(usuario)
@@ -185,11 +184,11 @@ def recov2(usu, rankSize, umbral):
     numerador = 0
     denominador = 0
     predicciones = []
-    resultado = []
 
+    #Comentar apartir de aqui para prueba
     for p_reco in p_recomendadas:
         for p_vis in p_vistas:
-            cos = similitud_coseno(df,int(p_reco[0]),p_vis)
+            cos = float(similitud_coseno(df,int(p_reco[0]),p_vis))
             if cos >= umbral:
                 rateUsu = obtenerRatings(usu, p_vis)
                 aux = cos * rateUsu
@@ -200,9 +199,30 @@ def recov2(usu, rankSize, umbral):
         else:
             prediccion = -5
         predicciones.append((p_reco,prediccion))
-    
+        print(p_reco, prediccion)
+
+    # Prueba con numero de datos limitados para monstrar funcionabilidad
+    '''counter = 0
+    for p_reco in p_recomendadas:
+        for p_vis in p_vistas:
+            cos = float(similitud_coseno(df,int(p_reco[0]),p_vis))
+            if cos >= umbral:
+                rateUsu = obtenerRatings(usu, p_vis)
+                aux = cos * rateUsu
+                numerador += aux
+                denominador += cos
+        if numerador != 0 and denominador !=0:
+            prediccion = numerador/denominador
+        else:
+            prediccion = -5
+        predicciones.append((p_reco,prediccion))
+        print(p_reco, prediccion)
+        counter = counter + 1
+        if (counter >= 10):
+            break
+    '''
     predicciones.sort(reverse=True, key=lambda x: x[1])
-    print(predicciones[:rankSize])
+    print('Yo recomiendo') #print stupido
     return predicciones
     
 

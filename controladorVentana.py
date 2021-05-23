@@ -1,11 +1,9 @@
 # Imports
 import sys
-from PyQt5 import QtWidgets, uic, QtGui
+from PyQt5 import QtWidgets, uic
 import recomendador as reco
 import re
-
-
-
+from PyQt5.QtWidgets import QTableWidgetItem, QHeaderView
 
 class MyWindow(QtWidgets.QMainWindow):
     
@@ -29,7 +27,6 @@ class MyWindow(QtWidgets.QMainWindow):
 
         #Cargar los datos en las combobox
         usus = self.post_usu()
-       
 
         self.cbox_usu.clear()
         self.cbox_usu.addItems(usus)
@@ -55,13 +52,33 @@ class MyWindow(QtWidgets.QMainWindow):
         u_sim = self.get_u_sim()
         print("Umbral: " + u_sim)
 
-        res = reco.recov2(usu,n_pelis,u_sim)
-        self.ql_reco.setColumnCount(2)
-        self.ql_reco.setRowCount(len(res))
+        res = []
+        if n_pelis != "":
+            if u_sim != "":
+                res = reco.recov2(usu,n_pelis,float(u_sim))
+                filas = len(res)
+            else:
+                res = reco.recov2(usu,n_pelis,float(0.75))
+                filas = len(res)
+        else:
+            if u_sim != "":
+                res = reco.recov2(usu,"5",float(u_sim))
+                filas = 5
+            else:
+                res = reco.recov2(usu,"5",float(0.75))
+                filas = 5
+      
+        self.ql_reco.setColumnCount(3)
+        self.ql_reco.setRowCount(filas)
     
         for i in range(0,len(res)):
-            for j in range(0,2):
-                self.ql_reco.setItem(i,j,QTableWidgetItem((res[i][j])))
+            self.ql_reco.setItem(i,0,QTableWidgetItem(str(res[i][0][0])))
+            self.ql_reco.setItem(i,1,QTableWidgetItem(str(res[i][0][1])))
+            self.ql_reco.setItem(i,2,QTableWidgetItem(str(res[i][1])))
+        
+        self.ql_reco.setHorizontalHeaderLabels(['ID Peli', 'Título', 'Rating'])
+        header = self.ql_reco.horizontalHeader()
+        header.setSectionResizeMode(QHeaderView.ResizeToContents)
 
     def controlador_predecir(self):
         usu = int(self.get_pred_usu())
